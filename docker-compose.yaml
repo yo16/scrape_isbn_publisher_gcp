@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  selenimum:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - 4444:4444
+      - 7900:7900
+    container_name: selenium
+    volumes:
+      - /dev/shm:/dev/shm
+      - socket:/tmp
+
+  scrape_app:
+    build: ./scrape_app
+    hostname: scrape-app
+    container_name: 'scrape-app'
+    environment:
+      SELENIUM_URL: http://selenium:4444/wd/hub
+    command: python /app/src/main.py
+    volumes:
+      - ./scrape_app:/app
+      - /dev/shm:/dev/shm
+      - socket:/tmp
+    depends_on:
+      - "selenimum"
+
+volumes:
+  socket:
